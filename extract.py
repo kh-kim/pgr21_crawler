@@ -46,8 +46,9 @@ def extract(filename):
 		if div.get('class') != None and div.get('class')[0] == 'vc_right':
 			time_stamp = concat_lines(div.get_text())
 
-			if len(time_stamp.split('/')[0]) == 2:
-				time_stamp = '20' + time_stamp + ":00"
+			if time_stamp[:2] != "20":
+				time_stamp = '20' + time_stamp
+			time_stamp = time_stamp + ":00"
 			time_stamp = re.sub('/', '-', time_stamp)
 		if div.get('class') != None and div.get('class')[0] == 'cmemo':
 			comment_content = concat_lines(div.get_text())
