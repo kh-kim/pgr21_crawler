@@ -20,8 +20,8 @@ Again, above command means that let crawler to collect a Free Board articles and
 Note that **the crawling will be automatically stopped** when the crawler trys to download more than 30 non-existing articles, and this threshold(=30) is hard-coded in the file.
 
 ## Result
-From the Free Board, the crwaler collects 56875 articles and 2470966 comments from it, and from the Qna Board, the crawler collects 84515 questions and 794519 replys from it.
-Also, 884519 dialogues are collected, too.
+From the Free Board, the crwaler collects 56,875 articles and 2,470,966 comments from it, and from the Qna Board, the crawler collects 84,515 questions and 794,519 replys from it.
+Also, 884,519 dialogues are collected, too.
 
 ## Author
 Ki Hyun Kim / pointzz.ki@gmail.com
