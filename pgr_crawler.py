@@ -1,53 +1,49 @@
 import sys
 from os import system
-import urllib
+from urllib import request
 import time
 import codecs
 
 import extract
 
-ARTICLE_FN = ['articles.txt', 'questions.txt']
-COMMENT_FN = ['comments.txt', 'answers.txt']
-URL = ["http://www.pgr21.com/pb/pb.php?id=freedom&no=%d", 'http://pgr21.com/pb/pb.php?id=qna&no=%d']
+BASE_URL = 'https://pgr21.com/%s/%d'
+TARGETS = ['recommend', 'discuss', 'election', 'freedom', 'spoent', 'qna', 'humor']
+
 INTERVAL = 2
 THRES = 30
 
 def download(url, filename):
-	f = urllib.urlopen(url)
+	request.urlretrieve(url, filename)
 
-	print "Download file from %s to %s" % (url, filename)
-	data = f.read()
+	print("Download file from %s to %s" % (url, filename))
 
-	f_ = open(filename, "w")
-	f_.write(data)
-	f_.close()
 
 if __name__ == "__main__":
-	reload(sys)
-	sys.setdefaultencoding('utf-8')
+	for phase, target in enumerate(TARGETS):
+		article_fn = '%s.txt' % target
+		comment_fn = '%s_comments.txt' % target
 
-	for phase in xrange(0, len(URL)):
-		url = URL[phase]
 		from_num = int(sys.argv[1 + (2 * phase)])
 		to_num = int(sys.argv[2 + (2 * phase)])
 
 		cnt = 0
-		for index in xrange(from_num, to_num + 1):
+		for index in range(from_num, to_num + 1):
 			try:
-				url_ = url % index
-				download(url_, "./tmp.html")
+				url = BASE_URL % (target, index)
+
+				download(url, "./tmp.html")
 				subject, writer, article, comments = extract.extract('./tmp.html')
 
 				if len(comments) > 0:
-					f = codecs.open(ARTICLE_FN[phase], 'a', 'utf-8')
-					f.write(("%d\t" % index) + subject.decode('utf-8') + '\t' + writer.decode('utf-8') + '\t' + article.decode('utf-8') + '\n')
+					f = open(article_fn, 'a')
+					f.write(("%d\t" % index) + subject + '\t' + writer + '\t' + article + '\n')
 					f.close()
 
-					f = codecs.open(COMMENT_FN[phase], 'a', 'utf-8')
+					f = open(comment_fn, 'a')
 					for c_id in sorted(comments.keys()):
 						p_id, depth, user_id, comment, time_stamp = comments[c_id]
-						f.write("%s\t%d\t%s\t%s\t%d\t%s\t%s\n" % (time_stamp, index, c_id, p_id, depth, user_id.decode('utf-8'), comment.decode('utf-8')))
-						print "%s\t%d\t%s\t%s\t%d\t%s\t%s\n" % (time_stamp, index, c_id, p_id, depth, user_id, comment)
+						f.write("%s\t%d\t%s\t%s\t%d\t%s\t%s\n" % (time_stamp, index, c_id, p_id, depth, user_id, comment))
+						print("%s\t%d\t%s\t%s\t%d\t%s\t%s\n" % (time_stamp, index, c_id, p_id, depth, user_id, comment))
 
 					f.close()
 
@@ -57,6 +53,6 @@ if __name__ == "__main__":
 
 					if cnt > THRES:
 						break
-			except Exception, e:
-				pass
+			except Exception as e:
+				print(e)
 			time.sleep(INTERVAL)

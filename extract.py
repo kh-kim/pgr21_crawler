@@ -15,6 +15,21 @@ def concat_lines(line):
 
 	return line.strip()
 
+def remove_postfix(line, postfix=['수정', '삭제', '해시', '아이콘']):
+	tokens = line.split(' ')
+	tokens.reverse()
+	ret = []
+
+	flag_on = False
+	for t in tokens:
+		if t not in postfix or flag_on:
+			ret += [t]
+			flag_on = True
+
+	ret.reverse()
+
+	return ' '.join(ret)
+
 def extract(filename):
 	f = codecs.open(filename, 'r', 'utf-8')
 	d = f.read()
@@ -42,9 +57,9 @@ def extract(filename):
 			article = concat_lines(div.get_text())
 		if div.get('class') != None and div.get('class')[0] == 'aReply':
 			comment_id = div.a['name']
-			user_id = concat_lines(div.get_text())
+			user_id = remove_postfix(concat_lines(div.get_text()))
 		if div.get('class') != None and div.get('class')[0] == 'vc_right':
-			time_stamp = concat_lines(div.get_text())
+			time_stamp = remove_postfix(concat_lines(div.get_text()))
 
 			if time_stamp[:2] != "20":
 				time_stamp = '20' + time_stamp
@@ -70,4 +85,4 @@ def extract(filename):
 	return subject, writer, article, comments
 
 if __name__ == "__main__":
-	print extract('./tmp_.html')
+	print(extract('./tmp_.html'))
